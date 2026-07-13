@@ -1,0 +1,38 @@
+%% BlueForge high-level architecture
+flowchart TB
+    subgraph LAB["Lab environment (isolated VMs)"]
+        WIN["Windows VM + Sysmon"]
+        LIN["Ubuntu / Kali VM"]
+        KALI["Kali VM (attack simulation)"]
+    end
+
+    subgraph COLLECT["1. Collection"]
+        WZAGENT["Wazuh agents"]
+        WZMGR["Wazuh manager"]
+    end
+
+    subgraph BF["BlueForge (Python)"]
+        COL["Collectors"]
+        NORM["Normalizer (common schema)"]
+        ENG["Detection engine (Sigma-style)"]
+        ENR["Enrichment (IOC + threat intel)"]
+        REP["Reporting (incident report)"]
+        HUNT["Hunting (queries + timeline)"]
+    end
+
+    subgraph CLOUD["Microsoft stack (Phase 4+)"]
+        SENT["Microsoft Sentinel / Defender XDR"]
+        KQL["KQL analytics rules"]
+    end
+
+    WIN --> WZAGENT
+    LIN --> WZAGENT
+    KALI -. generates telemetry .-> WIN
+    WZAGENT --> WZMGR
+    WZMGR --> COL
+    COL --> NORM --> ENG --> ENR
+    ENR --> REP
+    ENR --> HUNT
+    ENG -. parity rules .-> KQL
+    WIN -. optional forwarding .-> SENT
+    KQL --> SENT

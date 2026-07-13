@@ -1,0 +1,7 @@
+// BlueForge bf-0001 | PowerShell encoded command | MITRE T1059.001
+// Table: DeviceProcessEvents (Microsoft Defender for Endpoint / Sentinel)
+DeviceProcessEvents
+| where FileName =~ "powershell.exe"
+| where ProcessCommandLine has_any ("-enc", "-EncodedCommand")
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+| order by Timestamp desc

@@ -1,0 +1,2 @@
+{"_source":"linux","timestamp":"2026-07-12 03:10:01","host":"web-01","program":"sshd","user":"root","src_ip":"185.220.101.4","message":"Failed password for root from 185.220.101.4 port 51512 ssh2"}
+{"_source":"linux","timestamp":"2026-07-12 03:10:04","host":"web-01","program":"sshd","user":"root","src_ip":"185.220.101.4","message":"Accepted password for root from 185.220.101.4 port 51520 ssh2"}

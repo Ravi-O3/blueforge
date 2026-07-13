@@ -1,0 +1,8 @@
+# Runtime dependencies (kept intentionally small and explainable).
+pydantic>=2.6          # typed config + normalized event schema validation
+pyyaml>=6.0            # read Sigma rules and YAML config
+python-evtx>=0.8.0     # parse Windows .evtx event logs
+rich>=13.7             # readable CLI output and tables
+requests>=2.31         # HTTP calls for enrichment (VirusTotal, AbuseIPDB)
+jinja2>=3.1            # render incident report templates
+click>=8.1            # command line interface

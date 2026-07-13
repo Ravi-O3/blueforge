@@ -1,0 +1,31 @@
+name: New detection
+description: Propose a new detection rule
+labels: ["type: detection"]
+body:
+  - type: input
+    id: technique
+    attributes:
+      label: MITRE ATT&CK technique
+      placeholder: "T1059.001 - PowerShell"
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Attacker behavior to detect
+      description: What does the adversary do, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: logsource
+    attributes:
+      label: Log source and key fields
+      placeholder: "Sysmon EventID 1 (process create): Image, CommandLine, ParentImage"
+    validations:
+      required: true
+  - type: textarea
+    id: fp
+    attributes:
+      label: Expected false positives
+    validations:
+      required: false

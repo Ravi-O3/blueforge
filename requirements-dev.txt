@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest>=8.0            # unit tests
+pytest-cov>=4.1        # coverage reports
+ruff>=0.3             # fast linter + formatter
+mypy>=1.9             # static type checking
+pre-commit>=3.6       # git hooks that run lint/tests before commit

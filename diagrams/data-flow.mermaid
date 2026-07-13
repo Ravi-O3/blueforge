@@ -1,0 +1,10 @@
+%% BlueForge data flow: one event from raw log to report
+flowchart LR
+    A["Raw log line\n(Sysmon/Win/Linux/Wazuh)"] --> B["Collector\n.collect() -> dict"]
+    B --> C["Normalizer\ndict -> Event (common schema)"]
+    C --> D{"Detection engine\nmatch rules?"}
+    D -- "no match" --> E["Discard / archive"]
+    D -- "match" --> F["Enrichment\nextract IOCs, reputation"]
+    F --> G["Incident report (Markdown)"]
+    F --> H["Timeline / hunt pivot"]
+    D -. mitre mapping .-> I["ATT&CK coverage report"]

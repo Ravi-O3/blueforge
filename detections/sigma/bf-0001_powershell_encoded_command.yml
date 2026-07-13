@@ -1,0 +1,21 @@
+title: Suspicious PowerShell Encoded Command
+id: bf-0001
+status: experimental
+description: >
+  PowerShell launched with an encoded command (-enc / -EncodedCommand). Attackers
+  base64-encode payloads to hide intent and bypass simple string-based controls.
+author: Ravi
+date: 2026/07/12
+level: high
+mitre:
+  - T1059.001
+logsource:
+  category: process
+detection:
+  process|endswith: powershell.exe
+  command_line|contains:
+    - "-enc"
+    - "-encodedcommand"
+  condition: all
+falsepositives:
+  - Some legitimate management tooling uses encoded commands. Baseline your environment.

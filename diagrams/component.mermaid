@@ -1,0 +1,16 @@
+%% BlueForge Python package components and dependencies
+flowchart TB
+    CLI["cli.py (click)"] --> COLL["collectors/"]
+    CLI --> NORM["normalizer/"]
+    CLI --> DET["detections/engine.py"]
+    CLI --> REP["reporting/"]
+    COLL --> SCH["schema.py (Event)"]
+    NORM --> SCH
+    DET --> SCH
+    ENR["enrichment/"] --> SCH
+    REP --> DET
+    REP --> ENR
+    CFG["config.py"] --> ENR
+    LOG["logging_config.py"] --> CLI
+    UTIL["utils/io.py"] --> COLL
+    UTIL --> REP

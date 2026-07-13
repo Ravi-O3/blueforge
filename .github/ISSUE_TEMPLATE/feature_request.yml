@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose a new capability
+labels: ["type: feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What SOC / detection problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Roadmap phase
+      options: ["0-foundation", "1-mvp", "2-detection-engine", "3-hunting", "4-automation", "5-ai", "6-enterprise"]
+    validations:
+      required: false

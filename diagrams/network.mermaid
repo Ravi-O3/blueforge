@@ -1,0 +1,16 @@
+%% BlueForge lab network (isolated host-only network)
+flowchart TB
+    subgraph HOST["Host machine (Ubuntu) - 192.168.1.10"]
+        VBOX["VirtualBox / KVM"]
+    end
+    subgraph NET["Host-only network 192.168.56.0/24"]
+        WZ["Wazuh manager + dashboard\n192.168.56.20"]
+        WIN["Windows 10 + Sysmon + Wazuh agent\n192.168.56.30"]
+        KALI["Kali attacker\n192.168.56.40"]
+    end
+    VBOX --- WZ
+    VBOX --- WIN
+    VBOX --- KALI
+    KALI -->|"simulated attacks"| WIN
+    WIN -->|"agent events"| WZ
+    WZ -->|"alerts JSON"| HOST

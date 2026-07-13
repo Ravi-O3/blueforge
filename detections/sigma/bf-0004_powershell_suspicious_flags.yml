@@ -1,0 +1,23 @@
+title: PowerShell Suspicious Execution Flags
+id: bf-0004
+status: experimental
+description: >
+  Combinations like -nop -w hidden and download cradles (IEX, DownloadString) are
+  strong signals of a malicious PowerShell run.
+author: Ravi
+date: 2026/07/12
+level: medium
+mitre:
+  - T1059.001
+logsource:
+  category: process
+detection:
+  command_line|contains:
+    - "-w hidden"
+    - "-windowstyle hidden"
+    - "downloadstring"
+    - "iex"
+    - "-nop"
+  condition: any
+falsepositives:
+  - Admin automation may use -nop. Weight this with other signals.

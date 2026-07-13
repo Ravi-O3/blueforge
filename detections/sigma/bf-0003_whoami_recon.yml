@@ -1,0 +1,18 @@
+title: Whoami Execution (Discovery)
+id: bf-0003
+status: experimental
+description: >
+  whoami is run by attackers right after gaining access to understand their
+  privileges. Rare on user workstations outside of IT activity.
+author: Ravi
+date: 2026/07/12
+level: medium
+mitre:
+  - T1033
+logsource:
+  category: process
+detection:
+  process|endswith: whoami.exe
+  condition: all
+falsepositives:
+  - IT administrators and login scripts. Correlate with parent process and user.

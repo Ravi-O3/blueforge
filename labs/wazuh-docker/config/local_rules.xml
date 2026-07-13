@@ -1,0 +1,53 @@
+<!--
+  BlueForge custom Wazuh rules.
+  Install: append to /var/ossec/etc/rules/local_rules.xml on the Wazuh manager,
+  then restart wazuh-manager. Rule IDs 100200+ are the local/custom range.
+
+  Each rule maps to a MITRE technique via the <mitre> block so alerts carry ATT&CK
+  context straight into the dashboard.
+-->
+<group name="blueforge,sysmon,">
+
+  <rule id="100201" level="12">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)-enc\s|-encodedcommand</field>
+    <description>BlueForge: PowerShell encoded command detected</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100202" level="12">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)urlcache|-f\s.*http</field>
+    <description>BlueForge: Certutil used to download a remote file</description>
+    <mitre>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+
+  <rule id="100203" level="6">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\whoami\.exe$</field>
+    <description>BlueForge: whoami discovery command executed</description>
+    <mitre>
+      <id>T1033</id>
+    </mitre>
+  </rule>
+
+</group>
+
+<group name="blueforge,syslog,sshd,">
+
+  <!-- Correlation: many failed SSH logins from one source in a short window -->
+  <rule id="100210" level="10" frequency="6" timeframe="120">
+    <if_matched_sid>5710</if_matched_sid>
+    <same_source_ip />
+    <description>BlueForge: SSH brute-force (6+ failures in 120s from one source)</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+</group>

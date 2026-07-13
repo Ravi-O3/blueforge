@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Secrets and local config (NEVER commit these)
+.env
+*.key
+*.pem
+secrets.yaml
+config.local.yaml
+
+# Lab data and raw logs (can be large / sensitive)
+data/
+*.evtx
+*.pcap
+labs/**/loot/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Enrichment caches
+.cache/
+geoip/*.mmdb

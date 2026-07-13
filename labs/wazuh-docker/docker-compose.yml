@@ -1,0 +1,40 @@
+# Minimal single-node Wazuh stack for the lab. NOT for production.
+# Change every default password before first use. See the official Wazuh docker docs
+# for the full multi-node deployment; this is the smallest thing that gives you a
+# working manager + indexer + dashboard to practice against.
+services:
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.9.0
+    hostname: wazuh.manager
+    restart: unless-stopped
+    ports:
+      - "1514:1514"      # agent events
+      - "1515:1515"      # agent enrollment
+      - "55000:55000"    # manager API
+    environment:
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=CHANGE_ME_ADMIN
+    volumes:
+      - ./config/local_rules.xml:/var/ossec/etc/rules/local_rules.xml:ro
+
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.9.0
+    hostname: wazuh.indexer
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.9.0
+    hostname: wazuh.dashboard
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=CHANGE_ME_ADMIN
+    depends_on:
+      - wazuh.indexer

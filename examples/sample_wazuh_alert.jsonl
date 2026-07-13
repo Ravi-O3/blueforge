@@ -1,0 +1,1 @@
+{"_source":"wazuh","timestamp":"2026-07-12T14:06:03","agent":{"name":"WKSTN-07"},"rule":{"id":"100210","level":12,"description":"Certutil used to download a remote file"},"src_ip":"45.77.12.9"}

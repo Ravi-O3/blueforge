@@ -1,0 +1,23 @@
+title: Certutil Used to Download a File
+id: bf-0002
+status: experimental
+description: >
+  certutil.exe is a signed Windows binary (a LOLBIN) abused to download remote
+  payloads while looking legitimate. Downloading over http with -urlcache is a
+  classic ingress-tool-transfer pattern.
+author: Ravi
+date: 2026/07/12
+level: high
+mitre:
+  - T1105
+  - T1218
+logsource:
+  category: process
+detection:
+  process|endswith: certutil.exe
+  command_line|contains:
+    - "urlcache"
+    - "http"
+  condition: all
+falsepositives:
+  - Certutil has legitimate certificate uses. The download flags are the red flag.

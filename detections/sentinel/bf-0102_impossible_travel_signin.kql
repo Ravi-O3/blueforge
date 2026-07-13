@@ -1,0 +1,12 @@
+// BlueForge bf-0102 | Successful sign-in after failures from a risky IP | T1110 / T1078
+// Table: SigninLogs (Entra ID)
+SigninLogs
+| where ResultType == 0            // success
+| join kind=inner (
+    SigninLogs
+    | where ResultType != 0        // preceding failures
+    | summarize failures = count() by UserPrincipalName, IPAddress
+    | where failures >= 5
+) on UserPrincipalName, IPAddress
+| project TimeGenerated, UserPrincipalName, IPAddress, Location, failures
+| order by TimeGenerated desc
