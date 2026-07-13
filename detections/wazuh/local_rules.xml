@@ -36,6 +36,35 @@
     </mitre>
   </rule>
 
+  <rule id="100204" level="10">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\schtasks\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)[/-]create</field>
+    <description>BlueForge: scheduled task created via schtasks (persistence)</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
+
+  <rule id="100205" level="14">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)lsass</field>
+    <description>BlueForge: possible LSASS credential dump (lsass on a command line)</description>
+    <mitre>
+      <id>T1003.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100206" level="10">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\net1?\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)user\s+\S+.*[/-]add|localgroup\s+administrators.*[/-]add</field>
+    <description>BlueForge: local account created or added to administrators via net.exe</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+  </rule>
+
 </group>
 
 <group name="blueforge,syslog,sshd,">
@@ -47,6 +76,16 @@
     <description>BlueForge: SSH brute-force (6+ failures in 120s from one source)</description>
     <mitre>
       <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Direct root SSH logins should not happen; admins sudo from named accounts -->
+  <rule id="100211" level="10">
+    <if_sid>5715</if_sid>
+    <field name="dstuser" type="pcre2">^root$</field>
+    <description>BlueForge: successful SSH login as root (should be disabled by policy)</description>
+    <mitre>
+      <id>T1078.003</id>
     </mitre>
   </rule>
 

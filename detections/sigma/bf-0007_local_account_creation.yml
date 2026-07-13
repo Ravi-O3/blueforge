@@ -1,0 +1,25 @@
+title: Local Account Created via Net User
+id: bf-0007
+status: experimental
+description: >
+  net user <name> <pass> /add creates a local account. Attackers do this to keep
+  access that survives credential resets, then often follow with net localgroup
+  administrators /add to escalate it. On workstations this is rare enough to
+  alert on directly; account creation belongs to IT provisioning, not endpoints.
+author: Ravi
+date: 2026/07/13
+level: high
+mitre:
+  - T1136.001
+logsource:
+  category: process
+detection:
+  process|endswith:
+    - "net.exe"
+    - "net1.exe"
+  command_line|contains:
+    - "/add"
+  condition: all
+falsepositives:
+  - Helpdesk scripts that provision local accounts. Correlate with the Windows
+    4720 event and the creating user to separate IT from intruders.

@@ -61,13 +61,23 @@ def _map_windows(r: dict[str, Any]) -> Event:
 
 
 def _map_linux(r: dict[str, Any]) -> Event:
-    """Linux auth/syslog. sshd accepted/failed password lines, sudo, etc."""
+    """Linux auth/syslog. sshd accepted/failed password lines, sudo, etc.
+
+    Category logic: sshd lines are authentication; anything carrying a `command`
+    (auditd execve, sudo, shell history shippers) is a process event so that
+    process detections (e.g. bf-0008 curl-pipe-shell) can see it.
+    """
+    if r.get("program") == "sshd":
+        category = EventCategory.AUTHENTICATION
+    elif r.get("command"):
+        category = EventCategory.PROCESS
+    else:
+        category = EventCategory.OTHER
     return Event(
         timestamp=_ts(r.get("timestamp")),
         source="linux",
-        category=EventCategory.AUTHENTICATION
-        if r.get("program") == "sshd"
-        else EventCategory.OTHER,
+        category=category,
+        process=r.get("program"),
         host=r.get("host"),
         user=r.get("user"),
         src_ip=r.get("src_ip"),

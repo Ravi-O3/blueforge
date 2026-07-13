@@ -11,6 +11,14 @@ Supported matcher syntax (a deliberate subset of Sigma):
       process|endswith: "\\powershell.exe"
       condition: any        # 'any' (OR) or 'all' (AND) across the matchers above
 
+To AND two clauses on the SAME field (YAML keys must be unique), append a
+numeric discriminator that the engine ignores:
+
+    detection:
+      command_line|contains: ["curl", "wget"]        # downloader present, AND
+      command_line|contains|2: ["| bash", "| sh"]    # ...piped into a shell
+      condition: all
+
 Operators: equals (default), contains, startswith, endswith. Matching is
 case-insensitive because attackers vary casing to evade naive rules (an important
 lesson: never write a case-sensitive detection for command lines).
@@ -95,8 +103,11 @@ class DetectionEngine:
                 continue
             results = []
             for key, expected in rule.matchers.items():
-                field_name, _, operator = key.partition("|")
-                operator = operator or "equals"
+                # key = field, field|operator, or field|operator|N (N lets a rule
+                # repeat the same field+operator, since YAML keys must be unique)
+                parts = key.split("|")
+                field_name = parts[0]
+                operator = parts[1] if len(parts) > 1 and parts[1] else "equals"
                 results.append(_op_match(event.get(field_name), operator, expected))
             if not results:
                 continue

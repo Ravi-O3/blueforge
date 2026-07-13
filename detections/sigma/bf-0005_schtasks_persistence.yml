@@ -1,0 +1,24 @@
+title: Scheduled Task Created via Schtasks
+id: bf-0005
+status: experimental
+description: >
+  schtasks.exe /create is the most common living-off-the-land persistence
+  primitive on Windows. Attackers register a task that re-launches their payload
+  at logon, boot, or on a timer, surviving reboots without touching the registry
+  Run keys everyone watches.
+author: Ravi
+date: 2026/07/13
+level: high
+mitre:
+  - T1053.005
+logsource:
+  category: process
+detection:
+  process|endswith: schtasks.exe
+  command_line|contains:
+    - "/create"
+    - "-create"
+  condition: all
+falsepositives:
+  - Software installers and IT management tools create tasks legitimately.
+    Baseline task names and creating users, then alert on the unknown ones.
