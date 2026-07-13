@@ -38,3 +38,6 @@ Thumbs.db
 # Enrichment caches
 .cache/
 geoip/*.mmdb
+
+# MS Office lock files
+~$*
