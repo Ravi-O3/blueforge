@@ -4,6 +4,7 @@
 Run in CI so a malformed rule can never reach main. Zero external dependencies
 beyond pyyaml, which keeps the CI job fast.
 """
+
 from __future__ import annotations
 
 import sys
