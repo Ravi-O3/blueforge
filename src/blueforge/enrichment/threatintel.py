@@ -26,11 +26,12 @@ def check_ip_abuseipdb(ip: str, config: Config, timeout: int = 10) -> Verdict:
     """Look up an IP reputation. Returns 'unknown' if no key is set."""
     if not config.abuseipdb_api_key:
         return Verdict(ip, "abuseipdb", None, "no API key configured")
+    params: dict[str, str | int] = {"ipAddress": ip, "maxAgeInDays": 90}
     try:
         resp = requests.get(
             "https://api.abuseipdb.com/api/v2/check",
             headers={"Key": config.abuseipdb_api_key, "Accept": "application/json"},
-            params={"ipAddress": ip, "maxAgeInDays": 90},
+            params=params,
             timeout=timeout,
         )
         resp.raise_for_status()

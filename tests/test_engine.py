@@ -32,10 +32,13 @@ def test_case_insensitive_matching(sigma_dir):
     from blueforge.normalizer import normalize
 
     engine = DetectionEngine(load_rules(sigma_dir))
-    e = normalize({
-        "_source": "sysmon", "EventID": 1,
-        "Image": "C:\\X\\POWERSHELL.EXE",
-        "CommandLine": "POWERSHELL.EXE -ENC AAAA",
-    })
+    e = normalize(
+        {
+            "_source": "sysmon",
+            "EventID": 1,
+            "Image": "C:\\X\\POWERSHELL.EXE",
+            "CommandLine": "POWERSHELL.EXE -ENC AAAA",
+        }
+    )
     ids = {m.detection.id for m in engine.evaluate(e)}
     assert "bf-0001" in ids

@@ -65,7 +65,9 @@ def _map_linux(r: dict[str, Any]) -> Event:
     return Event(
         timestamp=_ts(r.get("timestamp")),
         source="linux",
-        category=EventCategory.AUTHENTICATION if r.get("program") == "sshd" else EventCategory.OTHER,
+        category=EventCategory.AUTHENTICATION
+        if r.get("program") == "sshd"
+        else EventCategory.OTHER,
         host=r.get("host"),
         user=r.get("user"),
         src_ip=r.get("src_ip"),
@@ -80,10 +82,14 @@ def _map_wazuh(r: dict[str, Any]) -> Event:
         timestamp=_ts(r.get("timestamp")),
         source="wazuh",
         category=EventCategory.ALERT,
-        host=(r.get("agent") or {}).get("name") if isinstance(r.get("agent"), dict) else r.get("agent"),
+        host=(r.get("agent") or {}).get("name")
+        if isinstance(r.get("agent"), dict)
+        else r.get("agent"),
         user=r.get("user"),
         src_ip=r.get("src_ip"),
-        event_id=str((r.get("rule") or {}).get("id", "")) if isinstance(r.get("rule"), dict) else None,
+        event_id=str((r.get("rule") or {}).get("id", ""))
+        if isinstance(r.get("rule"), dict)
+        else None,
         raw=r,
     )
 

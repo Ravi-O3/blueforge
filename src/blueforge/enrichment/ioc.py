@@ -23,8 +23,22 @@ _PRIVATE_PREFIXES = ("10.", "192.168.", "127.", "169.254.")
 # File/script extensions that look like domains (e.g. "powershell.exe") but are not.
 # Keeping this list explicit and short makes the heuristic easy to explain and tune.
 _FILE_EXTENSIONS = {
-    "exe", "dll", "ps1", "bat", "cmd", "vbs", "js", "sys", "tmp",
-    "dat", "log", "txt", "lnk", "scr", "hta", "msi",
+    "exe",
+    "dll",
+    "ps1",
+    "bat",
+    "cmd",
+    "vbs",
+    "js",
+    "sys",
+    "tmp",
+    "dat",
+    "log",
+    "txt",
+    "lnk",
+    "scr",
+    "hta",
+    "msi",
 }
 
 
@@ -42,7 +56,9 @@ def extract_iocs(text: str) -> dict[str, list[str]]:
         return {"ipv4": [], "public_ipv4": [], "domain": [], "url": [], "md5": [], "sha256": []}
 
     ipv4 = sorted(set(_IPV4.findall(text)))
-    public = [ip for ip in ipv4 if not ip.startswith(_PRIVATE_PREFIXES) and not ip.startswith("172.")]
+    public = [
+        ip for ip in ipv4 if not ip.startswith(_PRIVATE_PREFIXES) and not ip.startswith("172.")
+    ]
     return {
         "ipv4": ipv4,
         "public_ipv4": public,

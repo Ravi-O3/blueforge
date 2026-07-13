@@ -27,7 +27,7 @@ _TEMPLATE = _ENV.from_string(
 
 ## Summary
 
-{{ matches|length }} detection(s) fired across the analyzed events. Highest severity: **{{ max_level }}**.
+{{ matches|length }} detection(s) fired. Highest severity: **{{ max_level }}**.
 
 ## Findings
 

@@ -39,7 +39,9 @@ def main() -> None:
 @main.command()
 @click.option("--logs", required=True, help="Path to a JSON Lines log file.")
 @click.option("--rules", default="detections/sigma", help="Directory of Sigma-style rules.")
-@click.option("--report", "report_path", default=None, help="Optional path to write a Markdown report.")
+@click.option(
+    "--report", "report_path", default=None, help="Optional path to write a Markdown report."
+)
 def detect(logs: str, rules: str, report_path: str | None) -> None:
     """Run detections over a log file and print what fired."""
     events = list(normalize_many(SampleCollector(logs).collect()))
@@ -52,7 +54,12 @@ def detect(logs: str, rules: str, report_path: str | None) -> None:
     table.add_column("MITRE")
     table.add_column("Host")
     for m in matches:
-        table.add_row(m.detection.title, m.detection.level, ", ".join(m.detection.mitre), m.event.host or "n/a")
+        table.add_row(
+            m.detection.title,
+            m.detection.level,
+            ", ".join(m.detection.mitre),
+            m.event.host or "n/a",
+        )
     console.print(table)
 
     if report_path:

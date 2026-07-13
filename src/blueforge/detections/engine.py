@@ -42,7 +42,7 @@ class Detection:
     falsepositives: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Detection":
+    def from_dict(cls, d: dict[str, Any]) -> Detection:
         detection = dict(d.get("detection", {}))
         condition = str(detection.pop("condition", "all")).lower()
         return cls(
