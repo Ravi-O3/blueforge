@@ -90,7 +90,20 @@ A file-by-file explanation is in [`docs/02-repository-structure.md`](docs/02-rep
 
 Detections are the core deliverable. Each rule is a small YAML/XML file with a title, the
 MITRE technique it maps to, the log it fires on, known false positives, and investigation steps.
-See the full plan (20 Sigma + 20 Wazuh detection ideas) in
+Current content: 8 Sigma rules and 8 Wazuh rules covering 8 ATT&CK techniques across
+execution, persistence, credential access, discovery, ingress tool transfer, and account
+creation. Every Sigma rule has a firing test and a false-positive (negative) test in `tests/`.
+
+Measure and visualize coverage:
+
+```bash
+python scripts/attack_coverage.py          # technique -> rule summary
+python scripts/attack_coverage.py --layer  # writes docs/attack_navigator_layer.json
+```
+
+Load the layer at the [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/)
+to see coverage heat-mapped on the enterprise matrix. See the full plan
+(20 Sigma + 20 Wazuh detection ideas) in
 [`docs/08-detection-engineering-plan.md`](docs/08-detection-engineering-plan.md) and the
 authoring guide in [`docs/detection-guide.md`](docs/detection-guide.md).
 
