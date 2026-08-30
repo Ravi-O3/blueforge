@@ -19,7 +19,18 @@ def _ts(value: Any) -> datetime:
     if isinstance(value, datetime):
         return value
     if isinstance(value, str):
-        for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+        cleaned = value.strip().replace("Z", "+00:00")
+        try:
+            return datetime.fromisoformat(cleaned)
+        except ValueError:
+            pass
+        for fmt in (
+            "%Y-%m-%dT%H:%M:%S.%f%z",
+            "%Y-%m-%dT%H:%M:%S%z",
+            "%Y-%m-%dT%H:%M:%S.%f",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%d %H:%M:%S",
+        ):
             try:
                 return datetime.strptime(value, fmt)
             except ValueError:
@@ -87,19 +98,33 @@ def _map_linux(r: dict[str, Any]) -> Event:
 
 
 def _map_wazuh(r: dict[str, Any]) -> Event:
-    """A Wazuh alert is already an alert. We keep its rule id and level in raw."""
+    """Map a Wazuh alert to our common Event schema, extracting process/user if present."""
+    rule = r.get("rule") if isinstance(r.get("rule"), dict) else {}
+    agent = r.get("agent") if isinstance(r.get("agent"), dict) else {}
+    data = r.get("data") if isinstance(r.get("data"), dict) else {}
+    win_data = data.get("win", {}) if isinstance(data.get("win"), dict) else {}
+    event_data = win_data.get("eventdata", {}) if isinstance(win_data.get("eventdata"), dict) else {}
+
+    process = event_data.get("image") or r.get("process")
+    command_line = event_data.get("commandLine") or r.get("command") or r.get("full_log")
+    parent_process = event_data.get("parentImage") or r.get("parent_process")
+    user = event_data.get("user") or data.get("dstuser") or data.get("srcuser") or r.get("user")
+    src_ip = r.get("src_ip") or data.get("srcip")
+
+    category = EventCategory.PROCESS if (process or command_line) else EventCategory.ALERT
+    host_name = agent.get("name") if isinstance(agent, dict) else (str(agent) if agent else None)
+
     return Event(
         timestamp=_ts(r.get("timestamp")),
         source="wazuh",
-        category=EventCategory.ALERT,
-        host=(r.get("agent") or {}).get("name")
-        if isinstance(r.get("agent"), dict)
-        else r.get("agent"),
-        user=r.get("user"),
-        src_ip=r.get("src_ip"),
-        event_id=str((r.get("rule") or {}).get("id", ""))
-        if isinstance(r.get("rule"), dict)
-        else None,
+        category=category,
+        host=host_name,
+        user=user,
+        process=process,
+        command_line=command_line,
+        parent_process=parent_process,
+        src_ip=src_ip,
+        event_id=str(rule.get("id", "")) if rule else None,
         raw=r,
     )
 
@@ -113,8 +138,21 @@ _MAPPERS = {
 
 
 def normalize(raw: dict[str, Any]) -> Event:
-    """Normalize one raw record. Uses the `_source` key to pick the mapper."""
-    source = str(raw.get("_source", "other")).lower()
+    """Normalize one raw record. Auto-detects source if _source is not provided."""
+    source = str(raw.get("_source", "")).lower()
+    if not source:
+        if "rule" in raw and ("agent" in raw or "manager" in raw):
+            source = "wazuh"
+        elif "EventID" in raw or "UtcTime" in raw or "CommandLine" in raw or "TargetUserName" in raw:
+            if "UtcTime" in raw or raw.get("EventID") in {1, 2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 22, "1", "2", "3", "5", "7", "8", "9", "10", "11", "12", "13", "22"}:
+                source = "sysmon"
+            else:
+                source = "windows"
+        elif "program" in raw or "syslog" in raw:
+            source = "linux"
+        else:
+            source = "other"
+
     mapper = _MAPPERS.get(source)
     if mapper is None:
         return Event(timestamp=_ts(raw.get("timestamp")), source=source, raw=raw)

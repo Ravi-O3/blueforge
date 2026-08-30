@@ -30,3 +30,23 @@ def test_windows_failed_logon_is_authentication():
 def test_unknown_source_preserved_in_raw():
     e = normalize({"_source": "mystery", "foo": "bar"})
     assert e.raw["foo"] == "bar"
+
+
+def test_real_wazuh_alert_auto_detection():
+    raw = {
+        "timestamp": "2026-08-30T23:34:19.770+0000",
+        "rule": {
+            "level": 7,
+            "description": "New dpkg (Debian Package) installed.",
+            "id": "2902",
+        },
+        "agent": {"id": "000", "name": "ravi"},
+        "manager": {"name": "ravi"},
+        "full_log": "status installed man-db:arm64 2.12.0",
+    }
+    e = normalize(raw)
+    assert e.source == "wazuh"
+    assert e.host == "ravi"
+    assert e.event_id == "2902"
+    assert e.category == EventCategory.PROCESS
+    assert "man-db" in e.command_line
