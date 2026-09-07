@@ -99,11 +99,20 @@ def _map_linux(r: dict[str, Any]) -> Event:
 
 def _map_wazuh(r: dict[str, Any]) -> Event:
     """Map a Wazuh alert to our common Event schema, extracting process/user if present."""
-    rule = r.get("rule") if isinstance(r.get("rule"), dict) else {}
-    agent = r.get("agent") if isinstance(r.get("agent"), dict) else {}
-    data = r.get("data") if isinstance(r.get("data"), dict) else {}
-    win_data = data.get("win", {}) if isinstance(data.get("win"), dict) else {}
-    event_data = win_data.get("eventdata", {}) if isinstance(win_data.get("eventdata"), dict) else {}
+    raw_rule = r.get("rule")
+    rule: dict[str, Any] = raw_rule if isinstance(raw_rule, dict) else {}
+
+    raw_agent = r.get("agent")
+    agent: dict[str, Any] = raw_agent if isinstance(raw_agent, dict) else {}
+
+    raw_data = r.get("data")
+    data: dict[str, Any] = raw_data if isinstance(raw_data, dict) else {}
+
+    raw_win = data.get("win")
+    win_data: dict[str, Any] = raw_win if isinstance(raw_win, dict) else {}
+
+    raw_event = win_data.get("eventdata")
+    event_data: dict[str, Any] = raw_event if isinstance(raw_event, dict) else {}
 
     process = event_data.get("image") or r.get("process")
     command_line = event_data.get("commandLine") or r.get("command") or r.get("full_log")
@@ -112,7 +121,7 @@ def _map_wazuh(r: dict[str, Any]) -> Event:
     src_ip = r.get("src_ip") or data.get("srcip")
 
     category = EventCategory.PROCESS if (process or command_line) else EventCategory.ALERT
-    host_name = agent.get("name") if isinstance(agent, dict) else (str(agent) if agent else None)
+    host_name = agent.get("name") if agent else (str(raw_agent) if raw_agent else None)
 
     return Event(
         timestamp=_ts(r.get("timestamp")),
@@ -143,8 +152,12 @@ def normalize(raw: dict[str, Any]) -> Event:
     if not source:
         if "rule" in raw and ("agent" in raw or "manager" in raw):
             source = "wazuh"
-        elif "EventID" in raw or "UtcTime" in raw or "CommandLine" in raw or "TargetUserName" in raw:
-            if "UtcTime" in raw or raw.get("EventID") in {1, 2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 22, "1", "2", "3", "5", "7", "8", "9", "10", "11", "12", "13", "22"}:
+        elif any(k in raw for k in ("EventID", "UtcTime", "CommandLine", "TargetUserName")):
+            sysmon_ids = {
+                1, 2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 22,
+                "1", "2", "3", "5", "7", "8", "9", "10", "11", "12", "13", "22",
+            }
+            if "UtcTime" in raw or raw.get("EventID") in sysmon_ids:
                 source = "sysmon"
             else:
                 source = "windows"
