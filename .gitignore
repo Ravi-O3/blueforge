@@ -41,3 +41,10 @@ geoip/*.mmdb
 
 # MS Office lock files
 ~$*
+
+# macOS
+.DS_Store
+
+# Local export artifacts
+*.bak
+*_tmp.html
